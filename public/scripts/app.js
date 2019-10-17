@@ -72,7 +72,7 @@ function removeLocation(evt) {
  * @param {Object} data Weather forecast data to update the element with.
  */
 function renderForecast(card, data) {
-  if (!data) {
+  if (lastUpdated >= data.currently.time) {
     // There's no data, skip the update.
     return;
   }
@@ -163,7 +163,21 @@ function getForecastFromNetwork(coords) {
  */
 function getForecastFromCache(coords) {
   // CODELAB: Add code to get weather forecast from the caches object.
-
+  if (!('caches' in window)) {
+    return null;
+  }
+  const url = `${window.location.origin}/forecast/${coords}`;
+  return caches.match(url)
+      .then((response) => {
+        if (response) {
+          return response.json();
+        }
+        return null;
+      })
+      .catch((err) => {
+        console.error('Error getting data from cache', err);
+        return null;
+      });
 }
 
 /**
